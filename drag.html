@@ -1,0 +1,124 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drag and Drop</title>
+  <style>
+    .container {
+      display: flex;
+    }
+
+    .left-container {
+      flex: 1;
+    }
+
+    .right-container {
+      flex: 1;
+    }
+
+    #drag-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .drag-item {
+      width: 100px;
+      border: 1px solid #ccc;
+      padding: 5px;
+      text-align: center;
+      cursor: grab;
+    }
+
+    .drag-over {
+      border: 2px dashed #aaa;
+    }
+
+    #drop-container {
+      width: 300px;
+      height: 200px;
+      border: 2px dashed #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left-container">
+      <h2>First Container</h2>
+      <div id="drag-container">
+        <div class="drag-item" draggable="true">
+          <img src="item1.jpg" alt="Item 1">
+          <p>Item 1</p>
+        </div>
+        <div class="drag-item" draggable="true">
+          <img src="item2.jpg" alt="Item 2">
+          <p>Item 2</p>
+        </div>
+        <div class="drag-item" draggable="true">
+          <img src="item3.jpg" alt="Item 3">
+          <p>Item 3</p>
+        </div>
+      </div>
+    </div>
+    <div class="right-container">
+      <h2>Second Container</h2>
+      <div id="drop-container"></div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const dragItems = document.querySelectorAll(".drag-item");
+      const dropContainer = document.getElementById("drop-container");
+
+      dragItems.forEach((dragItem) => {
+        dragItem.addEventListener("dragstart", dragStart);
+        dragItem.addEventListener("dragend", dragEnd);
+      });
+
+      dropContainer.addEventListener("dragover", dragOver);
+      dropContainer.addEventListener("dragenter", dragEnter);
+      dropContainer.addEventListener("dragleave", dragLeave);
+      dropContainer.addEventListener("drop", drop);
+
+      let draggedItem = null;
+
+      function dragStart(e) {
+        draggedItem = this;
+        this.classList.add("dragging");
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/html", this.innerHTML);
+      }
+
+      function dragEnd() {
+        draggedItem = null;
+        this.classList.remove("dragging");
+        const dragOverItems = document.querySelectorAll(".drag-over");
+        dragOverItems.forEach((item) => item.classList.remove("drag-over"));
+      }
+
+      function dragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+      }
+
+      function dragEnter() {
+        this.classList.add("drag-over");
+      }
+
+      function dragLeave() {
+        this.classList.remove("drag-over");
+      }
+
+      function drop(e) {
+        e.preventDefault();
+        const data = e.dataTransfer.getData("text/html");
+        this.innerHTML += data;
+        const draggedItemClone = document.querySelector(".dragging");
+        draggedItemClone.parentNode.removeChild(draggedItemClone);
+        this.classList.remove("drag-over");
+      }
+    });
+  </script>
+</body>
+</html>
